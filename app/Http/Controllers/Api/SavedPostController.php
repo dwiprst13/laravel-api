@@ -6,11 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\SavedPostResource;
 use App\Models\Post;
 use App\Models\SavedPost;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class SavedPostController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): AnonymousResourceCollection
     {
         $perPage = (int) min($request->integer('per_page', 10) ?: 10, 100);
 
@@ -24,7 +26,7 @@ class SavedPostController extends Controller
         return SavedPostResource::collection($saved);
     }
 
-    public function store(Request $request, Post $post)
+    public function store(Request $request, Post $post): JsonResponse
     {
         $user = $request->user();
 
@@ -38,7 +40,7 @@ class SavedPostController extends Controller
             ->setStatusCode(201);
     }
 
-    public function destroy(Request $request, Post $post)
+    public function destroy(Request $request, Post $post): JsonResponse
     {
         $user = $request->user();
 
