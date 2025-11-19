@@ -7,14 +7,16 @@ use App\Http\Requests\Post\StorePostRequest;
 use App\Http\Requests\Post\UpdatePostRequest;
 use App\Http\Resources\PostResource;
 use App\Models\Post;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class PostController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): AnonymousResourceCollection
     {
         $query = Post::query()
             ->with(['author', 'category'])
@@ -72,7 +74,7 @@ class PostController extends Controller
         return PostResource::collection($posts);
     }
 
-    public function store(StorePostRequest $request)
+    public function store(StorePostRequest $request): JsonResponse
     {
         $data = $request->validated();
 
@@ -93,7 +95,7 @@ class PostController extends Controller
         return PostResource::make($post)->response()->setStatusCode(201);
     }
 
-    public function show(Request $request, Post $post)
+    public function show(Request $request, Post $post): PostResource
     {
         $user = $request->user('sanctum') ?? $request->user();
 
@@ -106,7 +108,7 @@ class PostController extends Controller
         return PostResource::make($post);
     }
 
-    public function update(UpdatePostRequest $request, Post $post)
+    public function update(UpdatePostRequest $request, Post $post): PostResource
     {
         $data = $request->validated();
 
@@ -140,7 +142,7 @@ class PostController extends Controller
         return PostResource::make($post);
     }
 
-    public function recommendations(Request $request, Post $post)
+    public function recommendations(Request $request, Post $post): AnonymousResourceCollection
     {
         $user = $request->user('sanctum') ?? $request->user();
 
@@ -176,7 +178,7 @@ class PostController extends Controller
         return PostResource::collection($recommendations);
     }
 
-    public function destroy(Post $post)
+    public function destroy(Post $post): JsonResponse
     {
         if ($post->featured_image) {
             Storage::disk('public')->delete($post->featured_image);
