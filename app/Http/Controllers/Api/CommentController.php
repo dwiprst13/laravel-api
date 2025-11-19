@@ -8,12 +8,14 @@ use App\Http\Requests\Comment\UpdateCommentRequest;
 use App\Http\Resources\CommentResource;
 use App\Models\Comment;
 use App\Models\Post;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Validation\ValidationException;
 
 class CommentController extends Controller
 {
-    public function index(Request $request, Post $post)
+    public function index(Request $request, Post $post): AnonymousResourceCollection
     {
         $user = $request->user();
 
@@ -43,7 +45,7 @@ class CommentController extends Controller
         return CommentResource::collection($comments);
     }
 
-    public function store(StoreCommentRequest $request, Post $post)
+    public function store(StoreCommentRequest $request, Post $post): JsonResponse
     {
         $data = $request->validated();
 
@@ -70,7 +72,7 @@ class CommentController extends Controller
         return CommentResource::make($comment)->response()->setStatusCode(201);
     }
 
-    public function update(UpdateCommentRequest $request, Comment $comment)
+    public function update(UpdateCommentRequest $request, Comment $comment): CommentResource
     {
         $user = $request->user();
 
@@ -84,7 +86,7 @@ class CommentController extends Controller
         return CommentResource::make($comment);
     }
 
-    public function destroy(Request $request, Comment $comment)
+    public function destroy(Request $request, Comment $comment): JsonResponse
     {
         $user = $request->user();
 

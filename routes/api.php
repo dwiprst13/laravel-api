@@ -28,9 +28,9 @@ Route::prefix('v1')->group(function () {
         });
     });
 
-    Route::get('test', function () {
-        return 'ok';
-    });
+    // Route::get('test', function () {
+    //     return 'ok';
+    // });
 
     Route::get('settings', [SettingController::class, 'show']);
 
@@ -44,6 +44,8 @@ Route::prefix('v1')->group(function () {
 
     Route::post('messages', [MessageController::class, 'store']);
 
+
+    // Routes for authenticated uswrs
     Route::middleware('auth:sanctum')->group(function () {
         Route::controller(ProfileController::class)->group(function () {
             Route::get('profile', 'show');
@@ -74,6 +76,8 @@ Route::prefix('v1')->group(function () {
         Route::get('me/saved-posts', [SavedPostController::class, 'index']);
     });
 
+
+    // Routes foir admin roles
     Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function () {
         Route::controller(PostController::class)->group(function () {
             Route::post('posts', 'store');

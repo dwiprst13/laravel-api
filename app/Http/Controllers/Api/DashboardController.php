@@ -9,10 +9,11 @@ use App\Models\CommentReport;
 use App\Models\Message;
 use App\Models\Post;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 
 class DashboardController extends Controller
 {
-public function __invoke()
+public function __invoke(): JsonResponse
 {
     $totals = [
         'users' => User::count(),

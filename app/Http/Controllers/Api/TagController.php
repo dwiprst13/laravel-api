@@ -7,12 +7,14 @@ use App\Http\Requests\Tag\StoreTagRequest;
 use App\Http\Requests\Tag\UpdateTagRequest;
 use App\Http\Resources\TagResource;
 use App\Models\Tag;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Str;
 
 class TagController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): AnonymousResourceCollection
     {
         $query = Tag::query();
 
@@ -32,7 +34,7 @@ class TagController extends Controller
         return TagResource::collection($tags);
     }
 
-    public function store(StoreTagRequest $request)
+    public function store(StoreTagRequest $request): JsonResponse
     {
         $data = $request->validated();
         $data['slug'] = $this->prepareSlug($data['slug'] ?? null, $data['name']);
@@ -42,12 +44,12 @@ class TagController extends Controller
         return TagResource::make($tag)->response()->setStatusCode(201);
     }
 
-    public function show(Tag $tag)
+    public function show(Tag $tag): TagResource
     {
         return TagResource::make($tag);
     }
 
-    public function update(UpdateTagRequest $request, Tag $tag)
+    public function update(UpdateTagRequest $request, Tag $tag): TagResource
     {
         $data = $request->validated();
 
@@ -61,7 +63,7 @@ class TagController extends Controller
         return TagResource::make($tag);
     }
 
-    public function destroy(Tag $tag)
+    public function destroy(Tag $tag): JsonResponse
     {
         $tag->delete();
 

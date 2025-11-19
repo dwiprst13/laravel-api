@@ -7,11 +7,12 @@ use App\Http\Requests\Admin\UpdateUserRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Validation\ValidationException;
 
 class UserManagementController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): AnonymousResourceCollection
     {
         $query = User::query();
 
@@ -35,12 +36,12 @@ class UserManagementController extends Controller
         return UserResource::collection($users);
     }
 
-    public function show(User $user)
+    public function show(User $user): UserResource
     {
         return UserResource::make($user);
     }
 
-    public function update(UpdateUserRequest $request, User $user)
+    public function update(UpdateUserRequest $request, User $user): UserResource
     {
         $data = $request->validated();
 

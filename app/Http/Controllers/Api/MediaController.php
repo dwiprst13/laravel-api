@@ -7,13 +7,15 @@ use App\Http\Requests\Media\StoreMediaRequest;
 use App\Http\Requests\Media\UpdateMediaRequest;
 use App\Http\Resources\MediaResource;
 use App\Models\Media;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class MediaController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): AnonymousResourceCollection
     {
         $query = Media::query()->with('uploader');
 
@@ -40,7 +42,7 @@ class MediaController extends Controller
         return MediaResource::collection($media);
     }
 
-    public function store(StoreMediaRequest $request)
+    public function store(StoreMediaRequest $request): JsonResponse
     {
         $file = $request->file('file');
         $disk = 'public';
@@ -63,7 +65,7 @@ class MediaController extends Controller
         return MediaResource::make($media)->response()->setStatusCode(201);
     }
 
-    public function update(UpdateMediaRequest $request, Media $media)
+    public function update(UpdateMediaRequest $request, Media $media): MediaResource
     {
         $data = $request->validated();
 
@@ -99,12 +101,12 @@ class MediaController extends Controller
         return MediaResource::make($media->fresh()->load('uploader'));
     }
 
-    public function show(Media $media)
+    public function show(Media $media): MediaResource
     {
         return MediaResource::make($media->load('uploader'));
     }
 
-    public function destroy(Media $media)
+    public function destroy(Media $media): JsonResponse
     {
         if ($media->path) {
             Storage::disk($media->disk ?? 'public')->delete($media->path);
