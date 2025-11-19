@@ -7,13 +7,14 @@ use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
-    public function register(RegisterRequest $request)
+    public function register(RegisterRequest $request): JsonResponse
     {
         $data = $request->validated();
 
@@ -34,7 +35,7 @@ class AuthController extends Controller
         ], 201);
     }
 
-    public function login(LoginRequest $request)
+    public function login(LoginRequest $request): JsonResponse
     {
         $credentials = $request->validated();
 
@@ -55,7 +56,25 @@ class AuthController extends Controller
         ]);
     }
 
-    public function logout(Request $request)
+    public function token(Request $request): JsonResponse
+    {
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required'],
+        ]);
+
+        $user = User::where('email', $credentials['email'])->first();
+
+        if (! $user || ! Hash::check($credentials['password'], $user->password)) {
+            return response()->json(['message' => 'Bad credentials'], 401);
+        }
+
+        return response()->json([
+            'token' => $user->createToken('postman')->plainTextToken,
+        ]);
+    }
+
+    public function logout(Request $request): JsonResponse
     {
         $token = $request->user()?->currentAccessToken();
 
@@ -68,7 +87,7 @@ class AuthController extends Controller
         ]);
     }
 
-    public function me(Request $request)
+    public function me(Request $request): JsonResponse
     {
         return response()->json([
             'user' => UserResource::make($request->user()),
