@@ -55,6 +55,24 @@ class AuthController extends Controller
         ]);
     }
 
+    public function token(Request $request)
+    {
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required'],
+        ]);
+
+        $user = User::where('email', $credentials['email'])->first();
+
+        if (! $user || ! Hash::check($credentials['password'], $user->password)) {
+            return response()->json(['message' => 'Bad credentials'], 401);
+        }
+
+        return response()->json([
+            'token' => $user->createToken('postman')->plainTextToken,
+        ]);
+    }
+
     public function logout(Request $request)
     {
         $token = $request->user()?->currentAccessToken();
