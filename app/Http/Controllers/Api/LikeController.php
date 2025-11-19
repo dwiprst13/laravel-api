@@ -5,11 +5,12 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Like;
 use App\Models\Post;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class LikeController extends Controller
 {
-    public function store(Request $request, Post $post)
+    public function store(Request $request, Post $post): JsonResponse
     {
         $user = $request->user();
 
@@ -23,7 +24,7 @@ class LikeController extends Controller
         ], 201);
     }
 
-    public function destroy(Request $request, Post $post)
+    public function destroy(Request $request, Post $post): JsonResponse
     {
         $user = $request->user();
 
