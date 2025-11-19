@@ -7,12 +7,14 @@ use App\Http\Requests\Category\StoreCategoryRequest;
 use App\Http\Requests\Category\UpdateCategoryRequest;
 use App\Http\Resources\CategoryResource;
 use App\Models\Category;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Str;
 
 class CategoryController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): AnonymousResourceCollection
     {
         $query = Category::query();
 
@@ -32,7 +34,7 @@ class CategoryController extends Controller
         return CategoryResource::collection($categories);
     }
 
-    public function store(StoreCategoryRequest $request)
+    public function store(StoreCategoryRequest $request): JsonResponse
     {
         $data = $request->validated();
 
@@ -43,12 +45,12 @@ class CategoryController extends Controller
         return CategoryResource::make($category)->response()->setStatusCode(201);
     }
 
-    public function show(Category $category)
+    public function show(Category $category): CategoryResource
     {
         return CategoryResource::make($category);
     }
 
-    public function update(UpdateCategoryRequest $request, Category $category)
+    public function update(UpdateCategoryRequest $request, Category $category): CategoryResource
     {
         $data = $request->validated();
 
@@ -62,7 +64,7 @@ class CategoryController extends Controller
         return CategoryResource::make($category);
     }
 
-    public function destroy(Category $category)
+    public function destroy(Category $category): JsonResponse
     {
         $category->delete();
 
