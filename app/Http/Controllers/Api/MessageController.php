@@ -6,11 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Message\StoreMessageRequest;
 use App\Http\Resources\MessageResource;
 use App\Models\Message;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class MessageController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): AnonymousResourceCollection
     {
         $messages = Message::query()
             ->latest('created_at')
@@ -20,7 +22,7 @@ class MessageController extends Controller
         return MessageResource::collection($messages);
     }
 
-    public function store(StoreMessageRequest $request)
+    public function store(StoreMessageRequest $request): JsonResponse
     {
         $message = Message::create($request->validated());
 
@@ -29,12 +31,12 @@ class MessageController extends Controller
             ->setStatusCode(201);
     }
 
-    public function show(Message $message)
+    public function show(Message $message): MessageResource
     {
         return MessageResource::make($message);
     }
 
-    public function destroy(Message $message)
+    public function destroy(Message $message): JsonResponse
     {
         $message->delete();
 
