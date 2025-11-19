@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Storage;
 
 class SettingController extends Controller
 {
-    public function show()
+    public function show(): SettingResource
     {
         $setting = Setting::query()->first();
 
@@ -25,7 +25,7 @@ class SettingController extends Controller
         return SettingResource::make($setting);
     }
 
-    public function update(UpdateSettingRequest $request)
+    public function update(UpdateSettingRequest $request): SettingResource
     {
         $setting = Setting::query()->firstOrCreate([], [
             'site_name' => config('app.name', 'My Blog'),
