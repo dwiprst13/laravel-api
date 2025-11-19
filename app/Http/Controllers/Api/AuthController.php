@@ -21,39 +21,22 @@ class AuthController extends Controller
         $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
-            'password' => $data['password'],
+            'password' => $data['password'], 
             'role' => 'user',
             'bio' => $data['bio'] ?? null,
         ]);
 
-        $token = $user->createToken('api-token')->plainTextToken;
-
-        return response()->json([
-            'token' => $token,
-            'token_type' => 'Bearer',
-            'user' => UserResource::make($user),
-        ], 201);
+        return $this->tokenResponse($user);
     }
 
     public function login(LoginRequest $request): JsonResponse
     {
-        $credentials = $request->validated();
+        $user = $this->validateCredentials(
+            $request->validated()['email'],
+            $request->validated()['password']
+        );
 
-        $user = User::where('email', $credentials['email'])->first();
-
-        if (! $user || ! Hash::check($credentials['password'], $user->password)) {
-            throw ValidationException::withMessages([
-                'email' => __('auth.failed'),
-            ]);
-        }
-
-        $token = $user->createToken('api-token')->plainTextToken;
-
-        return response()->json([
-            'token' => $token,
-            'token_type' => 'Bearer',
-            'user' => UserResource::make($user),
-        ]);
+        return $this->tokenResponse($user);
     }
 
     public function token(Request $request): JsonResponse
@@ -63,11 +46,10 @@ class AuthController extends Controller
             'password' => ['required'],
         ]);
 
-        $user = User::where('email', $credentials['email'])->first();
-
-        if (! $user || ! Hash::check($credentials['password'], $user->password)) {
-            return response()->json(['message' => 'Bad credentials'], 401);
-        }
+        $user = $this->validateCredentials(
+            $credentials['email'],
+            $credentials['password']
+        );
 
         return response()->json([
             'token' => $user->createToken('postman')->plainTextToken,
@@ -91,6 +73,30 @@ class AuthController extends Controller
     {
         return response()->json([
             'user' => UserResource::make($request->user()),
+        ]);
+    }
+
+    private function validateCredentials(string $email, string $password): User
+    {
+        $user = User::where('email', $email)->first();
+
+        if (! $user || ! Hash::check($password, $user->password)) {
+            throw ValidationException::withMessages([
+                'email' => __('auth.failed'),
+            ]);
+        }
+
+        return $user;
+    }
+
+    private function tokenResponse(User $user): JsonResponse
+    {
+        $token = $user->createToken('api-token')->plainTextToken;
+
+        return response()->json([
+            'token' => $token,
+            'token_type' => 'Bearer',
+            'user' => UserResource::make($user),
         ]);
     }
 }
